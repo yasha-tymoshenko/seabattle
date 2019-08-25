@@ -1,8 +1,8 @@
 package com.tymoshenko.seabattle;
 
 public enum BoardCellType {
-    EMPTY('0'),
-    SHIP_BORDER_WATERS('~'),
+    EMPTY('~'),
+    SHIP_BORDER_WATERS('.'),
     SHIP('S'),
     DAMAGED('x'),
     DESTROYED('X'),

@@ -198,7 +198,7 @@ public class Board {
     private String printBoard() {
         StringBuilder sb = new StringBuilder("\n");
         for (int y = 0; y < HEIGHT; y++) {
-            sb.append(String.format("%2d", HEIGHT - y)).append(" ");
+            sb.append(String.format("%2d", y)).append(" ");
             for (int x = 0; x < WIDTH; x++) {
                 Coordinate coordinate = new Coordinate(x, y);
                 BoardCell cell = cellMap.get(coordinate);
