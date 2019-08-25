@@ -1,6 +1,7 @@
 package com.tymoshenko.seabattle;
 
 import com.tymoshenko.seabattle.exception.CantPlaceShipException;
+import com.tymoshenko.seabattle.ship.Fleet;
 import com.tymoshenko.seabattle.ship.Orientation;
 import com.tymoshenko.seabattle.ship.Ship;
 import com.tymoshenko.seabattle.ship.ShipType;
@@ -16,6 +17,7 @@ public class Board {
 
     private Map<Coordinate, BoardCell> cellMap;
     private Map<BoardCellType, List<BoardCell>> cellMapByType;
+    private Fleet fleet;
 
     public void init() {
         initCells();
@@ -32,6 +34,7 @@ public class Board {
     }
 
     public void placeShips() throws CantPlaceShipException {
+        fleet = new Fleet();
         List<ShipType> shipTypes = Arrays.asList(ShipType.values());
         Collections.reverse(shipTypes);
         for (ShipType shipType : shipTypes) {
@@ -91,8 +94,9 @@ public class Board {
                 borderWatersCells.add(boardCell);
             });
         }
+        fleet.addShip(ship);
         log.info("Ship placed: {}", ship);
-        log.info("Board: \n{}",printBoard());
+        log.info("Board: \n{}", printBoard());
     }
 
     private boolean canPlaceShip(Ship ship) {

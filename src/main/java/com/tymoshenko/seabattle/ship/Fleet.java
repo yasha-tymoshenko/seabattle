@@ -1,18 +1,28 @@
 package com.tymoshenko.seabattle.ship;
 
-import com.tymoshenko.seabattle.ship.Ship;
-import com.tymoshenko.seabattle.ship.ShipType;
-
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class Fleet {
-    private Map<ShipType, List<Ship>> shipsByType;
+    private Set<Ship> ships;
 
     public Fleet() {
-        shipsByType = new EnumMap<>(ShipType.class);
+        ships = new LinkedHashSet<>();
     }
 
+    public void addShip(Ship ship) {
+        ship.setBuilt(true);
+        ships.add(ship);
+    }
 
+    public boolean isDestroyed() {
+        boolean destroyed = true;
+        for (Ship ship : ships) {
+            if (!ship.isDestroyed()) {
+                destroyed = false;
+                break;
+            }
+        }
+        return destroyed;
+    }
 }

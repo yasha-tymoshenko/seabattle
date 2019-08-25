@@ -2,15 +2,17 @@ package com.tymoshenko.seabattle.ship;
 
 import com.tymoshenko.seabattle.Coordinate;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.*;
 
 @Data
 public class Ship {
     private final ShipType type;
-    private final List<Deck> decks;
-    private final Set<Coordinate> coordinates;
     private final Orientation orientation;
+    private final List<Deck> decks;
+    @ToString.Exclude
+    private final Set<Coordinate> coordinates;
     private boolean isBuilt;
     private boolean isDestroyed;
 
