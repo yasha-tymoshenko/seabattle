@@ -32,7 +32,9 @@ public class Board {
     }
 
     public void placeShips() throws CantPlaceShipException {
-        for (ShipType shipType : ShipType.values()) {
+        List<ShipType> shipTypes = Arrays.asList(ShipType.values());
+        Collections.reverse(shipTypes);
+        for (ShipType shipType : shipTypes) {
             for (int i = 0; i < shipType.getAmountInFleet(); i++) {
                 try {
                     placeShipRandom(shipType);
