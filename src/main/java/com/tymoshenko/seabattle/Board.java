@@ -19,31 +19,46 @@ public class Board {
 
     public void init() {
         initCells();
-        placeShips();
+        try {
+            placeShips();
+        } catch (CantPlaceShipException e) {
+            log.error("Failed to init board.", e);
+        }
     }
 
-    public void placeShips() {
+    @Override
+    public String toString() {
+        return printBoard();
+    }
+
+    public void placeShips() throws CantPlaceShipException {
         for (ShipType shipType : ShipType.values()) {
             for (int i = 0; i < shipType.getAmountInFleet(); i++) {
                 try {
                     placeShipRandom(shipType);
                 } catch (CantPlaceShipException e) {
                     log.warn("Can't place random ship.", e);
+                    boolean placed = false;
                     for (int retry = 0; retry < 200; retry++) {
                         try {
                             placeShipRandom(shipType);
+                            placed = true;
                         } catch (CantPlaceShipException ex) {
                             log.warn("Retry #{}.", retry, ex);
                             continue;
                         }
                         break;
                     }
+                    if (!placed) {
+                        throw new CantPlaceShipException(String.format(
+                                "Can't place ship of type=[%s]. Max number of retries exceeded.", shipType));
+                    }
                 }
             }
         }
     }
 
-    public void placeShipRandom(ShipType type) throws CantPlaceShipException {
+    private void placeShipRandom(ShipType type) throws CantPlaceShipException {
         Orientation orientation = Orientation.random();
         Coordinate randomFirstDeckCoordinate = findRandomEmptyCell().getCoordinate();
         try {
@@ -54,7 +69,7 @@ public class Board {
         }
     }
 
-    public void placeShip(ShipType type, Orientation orientation, Coordinate firstDeckCoordinate)
+    private void placeShip(ShipType type, Orientation orientation, Coordinate firstDeckCoordinate)
             throws CantPlaceShipException {
         Ship ship = new Ship(type, orientation, firstDeckCoordinate);
         if (!canPlaceShip(ship)) {
@@ -159,11 +174,6 @@ public class Board {
     private BoardCell findRandomEmptyCell() {
         List<BoardCell> emptyCells = cellMapByType.get(BoardCellType.EMPTY);
         return emptyCells.get(RANDOM.nextInt(emptyCells.size()));
-    }
-
-    @Override
-    public String toString() {
-        return printBoard();
     }
 
     private void initCells() {
