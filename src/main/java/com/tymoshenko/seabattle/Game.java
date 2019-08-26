@@ -17,15 +17,14 @@ public class Game {
     }
 
     public void start() {
-        int move = 1;
-        final int maxMoves = 1000;
+        int moveNumber = 1;
         do {
-            move = playerMove(player1, player2, move);
+            moveNumber = playerMove(player1, player2, moveNumber);
             if (player2.isFleetDestroyed()) {
                 break;
             }
-            move = playerMove(player2, player1, move);
-        } while (!(player1.isFleetDestroyed() || player2.isFleetDestroyed()) && move < maxMoves);
+            moveNumber = playerMove(player2, player1, moveNumber);
+        } while (!player1.isFleetDestroyed() && !player2.isFleetDestroyed());
         Player winner;
         if (player1.isFleetDestroyed()) {
             winner = player2;
@@ -35,18 +34,17 @@ public class Game {
         log.info("\n\nThe winner is: \t[{}]!\n", winner.getName());
     }
 
-    private int playerMove(Player player, Player enemy, int move) {
-        Coordinate target;
+    private int playerMove(Player player, Player enemy, int moveNumber) {
         ShotResult shotResult;
         do {
-            target = player.move();
+            Coordinate target = player.move();
             shotResult = enemy.processEnemyShot(target);
             player.drawOwnShotResult(shotResult);
-            log.info("----- Move #{}. ----- {}", move, player.toString());
-            move++;
+            log.info("----- Move #{}. ----- {}", moveNumber, player.toString());
+            moveNumber++;
         } while (!enemy.isFleetDestroyed() && (shotResult.getBoardCellType() == BoardCellType.DAMAGED ||
                 shotResult.getBoardCellType() == BoardCellType.DESTROYED));
-        return move;
+        return moveNumber;
     }
 
 }
