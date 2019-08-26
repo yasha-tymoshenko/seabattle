@@ -4,7 +4,7 @@ public enum BoardCellType {
     EMPTY('~'),
     SHIP_BORDER_WATERS('.'),
     SHIP('S'),
-    DAMAGED('x'),
+    DAMAGED('+'),
     DESTROYED('X'),
     MISSED_HIT('*')
     ;
