@@ -1,5 +1,6 @@
 package com.tymoshenko.seabattle.player;
 
+import com.tymoshenko.seabattle.board.BoardCellType;
 import com.tymoshenko.seabattle.board.Coordinate;
 import com.tymoshenko.seabattle.board.EnemyBoard;
 import com.tymoshenko.seabattle.board.PlayerBoard;
@@ -23,20 +24,25 @@ public class Player {
     }
 
     public Coordinate move() {
-        Coordinate target = shootingStrategy.shoot();
-        log.info("Player [{}] shoots at [{}].", name, target);
-        return target;
+        return shootingStrategy.shoot();
     }
 
     public void drawOwnShotResult(ShotResult shotResult) {
+        if (shotResult.getBoardCellType() == BoardCellType.DESTROYED) {
+            String shipType = shotResult.getDestroyedShip().isPresent()
+                    ? shotResult.getDestroyedShip().get().getType().name()
+                    : "unknown";
+            log.info("Player [{}] [{}] a [{}] at [{}].",
+                    name, shotResult.getBoardCellType().name(), shipType, shotResult.getCoordinate());
+        } else {
+            log.info("Player [{}] [{}] at [{}].",
+                    name, shotResult.getBoardCellType().name(), shotResult.getCoordinate());
+        }
         boardEnemy.drawShot(shotResult);
     }
 
     public ShotResult processEnemyShot(Coordinate coordinate) {
-        ShotResult shotResult = boardOwn.processEnemyShot(coordinate);
-        log.info("Player [{}]'s opponent [{}] at [{}].",
-                name, shotResult.getBoardCellType().name(), shotResult.getCoordinate());
-        return shotResult;
+        return boardOwn.processEnemyShot(coordinate);
     }
 
     public boolean isFleetDestroyed() {
