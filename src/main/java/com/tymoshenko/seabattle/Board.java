@@ -80,6 +80,7 @@ public class Board {
         if (!canPlaceShip(ship)) {
             throw new CantPlaceShipException(String.format("Cannot place ship: [%s].", ship));
         }
+        List<BoardCell> emptyCells = cellMapByType.get(BoardCellType.EMPTY);
         List<BoardCell> shipCells = cellMapByType.get(BoardCellType.SHIP);
         List<BoardCell> borderWatersCells = cellMapByType.get(BoardCellType.SHIP_BORDER_WATERS);
         for (Coordinate shipCoordinate : ship.getCoordinates()) {
@@ -88,10 +89,12 @@ public class Board {
             shipCell.setType(BoardCellType.SHIP);
             shipCells.add(shipCell);
             borderWatersCells.remove(shipCell);
+            emptyCells.remove(shipCell);
             // Draw border waters
             findBorderCells(shipCoordinate).forEach(boardCell -> {
                 boardCell.setType(BoardCellType.SHIP_BORDER_WATERS);
                 borderWatersCells.add(boardCell);
+                emptyCells.remove(boardCell);
             });
         }
         fleet.addShip(ship);
