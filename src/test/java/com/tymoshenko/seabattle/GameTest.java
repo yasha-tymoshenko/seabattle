@@ -4,8 +4,6 @@ import com.tymoshenko.seabattle.player.Player;
 import com.tymoshenko.seabattle.player.ShootingStrategyRandom;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class GameTest {
 
     @Test
