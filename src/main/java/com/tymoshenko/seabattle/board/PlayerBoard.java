@@ -1,4 +1,4 @@
-package com.tymoshenko.seabattle;
+package com.tymoshenko.seabattle.board;
 
 import com.tymoshenko.seabattle.exception.CantPlaceShipException;
 import com.tymoshenko.seabattle.ship.Fleet;
@@ -10,27 +10,17 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 
 @Slf4j
-public class Board {
-    private static final int WIDTH = 10;
-    private static final int HEIGHT = 10;
-    private static final Random RANDOM = new Random();
-
-    private Map<Coordinate, BoardCell> cellMap;
-    private Map<BoardCellType, List<BoardCell>> cellMapByType;
+public class PlayerBoard extends Board {
     private Fleet fleet;
 
+    @Override
     public void init() {
-        initCells();
+        super.init();
         try {
             placeShips();
         } catch (CantPlaceShipException e) {
             log.error("Failed to init board.", e);
         }
-    }
-
-    @Override
-    public String toString() {
-        return printBoard();
     }
 
     public void placeShips() throws CantPlaceShipException {
@@ -183,43 +173,5 @@ public class Board {
     private BoardCell findRandomEmptyCell() {
         List<BoardCell> emptyCells = cellMapByType.get(BoardCellType.EMPTY);
         return emptyCells.get(RANDOM.nextInt(emptyCells.size()));
-    }
-
-    private void initCells() {
-        cellMap = new LinkedHashMap<>();
-        cellMapByType = new EnumMap<>(BoardCellType.class);
-        List<BoardCell> cells = new ArrayList<>();
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                Coordinate coordinate = new Coordinate(x, y);
-                BoardCellType empty = BoardCellType.EMPTY;
-                BoardCell cell = new BoardCell(coordinate, empty);
-                cellMap.put(coordinate, cell);
-                cells.add(cell);
-                cellMapByType.put(empty, cells);
-            }
-        }
-        for (BoardCellType cellType : BoardCellType.values()) {
-            cellMapByType.putIfAbsent(cellType, new ArrayList<>());
-        }
-    }
-
-    private String printBoard() {
-        StringBuilder sb = new StringBuilder("\n");
-        for (int y = 0; y < HEIGHT; y++) {
-            sb.append(String.format("%2d", y)).append(" ");
-            for (int x = 0; x < WIDTH; x++) {
-                Coordinate coordinate = new Coordinate(x, y);
-                BoardCell cell = cellMap.get(coordinate);
-                sb.append(cell.getType()).append(" ");
-            }
-            sb.append("\n");
-        }
-        sb.append("   ");
-        for (char ch = 'A'; ch < 'A' + WIDTH; ch++) {
-            sb.append(ch).append(" ");
-        }
-        sb.append("\n");
-        return sb.toString();
     }
 }

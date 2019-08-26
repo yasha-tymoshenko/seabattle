@@ -1,6 +1,6 @@
 package com.tymoshenko.seabattle.ship;
 
-import com.tymoshenko.seabattle.Coordinate;
+import com.tymoshenko.seabattle.board.Coordinate;
 import lombok.Data;
 import lombok.ToString;
 

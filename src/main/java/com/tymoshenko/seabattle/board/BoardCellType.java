@@ -1,4 +1,4 @@
-package com.tymoshenko.seabattle;
+package com.tymoshenko.seabattle.board;
 
 public enum BoardCellType {
     EMPTY('~'),
