@@ -46,4 +46,25 @@ public class Ship {
     public Deck getLastDeck() {
         return decks.get(decks.size() - 1);
     }
+
+    public void damage(Coordinate coordinate) {
+        for (Deck deck : decks) {
+            if (deck.getCoordinate().equals(coordinate)) {
+                deck.setHit(true);
+                return;
+            }
+        }
+    }
+
+    public boolean isDestroyed() {
+        boolean destroyed = true;
+        for (Deck deck : decks) {
+            if (!deck.isHit()) {
+                destroyed = false;
+                break;
+            }
+        }
+        return destroyed;
+    }
+
 }

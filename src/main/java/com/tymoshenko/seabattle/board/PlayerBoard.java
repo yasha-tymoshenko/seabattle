@@ -1,6 +1,8 @@
 package com.tymoshenko.seabattle.board;
 
 import com.tymoshenko.seabattle.exception.CantPlaceShipException;
+import com.tymoshenko.seabattle.exception.IllegalTargetException;
+import com.tymoshenko.seabattle.player.ShotResult;
 import com.tymoshenko.seabattle.ship.Fleet;
 import com.tymoshenko.seabattle.ship.Orientation;
 import com.tymoshenko.seabattle.ship.Ship;
@@ -23,7 +25,40 @@ public class PlayerBoard extends Board {
         }
     }
 
-    public void placeShips() throws CantPlaceShipException {
+    public ShotResult processEnemyShot(Coordinate targetCoordinate) {
+        BoardCell targetBoardCell = cellMap.get(targetCoordinate);
+        BoardCellType shotResultType;
+        Ship destroyedShip = null;
+        switch (targetBoardCell.getType()) {
+            case EMPTY:
+            case SHIP_BORDER_WATERS:
+                shotResultType = BoardCellType.MISSED_HIT;
+                drawMissed(targetBoardCell);
+                break;
+            case SHIP: {
+                // Damaged or destroyed
+                Ship shipUnderAttack = fleet.getShipByCoordinate(targetCoordinate);
+                shipUnderAttack.damage(targetCoordinate);
+                if (shipUnderAttack.isDestroyed()) {
+                    shotResultType = BoardCellType.DESTROYED;
+                    drawDamaged(targetBoardCell);
+                    drawDestroyed(shipUnderAttack);
+                    shipUnderAttack.setDestroyed(true);
+                    destroyedShip = shipUnderAttack;
+                } else {
+                    shotResultType = BoardCellType.DAMAGED;
+                    drawDamaged(targetBoardCell);
+                }
+            }
+            break;
+            default:
+                throw new IllegalTargetException(String.format("Cannot target [%s] cell at [%s].",
+                        targetBoardCell.getType(), targetBoardCell.getCoordinate()));
+        }
+        return new ShotResult(targetCoordinate, shotResultType, destroyedShip);
+    }
+
+    private void placeShips() throws CantPlaceShipException {
         fleet = new Fleet();
         List<ShipType> shipTypes = Arrays.asList(ShipType.values());
         Collections.reverse(shipTypes);
@@ -114,64 +149,32 @@ public class PlayerBoard extends Board {
         return !conflict;
     }
 
-    private List<BoardCell> findBorderCells(Coordinate coordinate) {
-        List<BoardCell> cells = new ArrayList<>();
-        findEmptyCellRight(coordinate).ifPresent(cells::add);
-        findEmptyCellDown(coordinate).ifPresent(cells::add);
-        findEmptyCellLeft(coordinate).ifPresent(cells::add);
-        findEmptyCellUp(coordinate).ifPresent(cells::add);
-        findEmptyCellDiagonalUpRight(coordinate).ifPresent(cells::add);
-        findEmptyCellDiagonalDownRight(coordinate).ifPresent(cells::add);
-        findEmptyCellDiagonalDownLeft(coordinate).ifPresent(cells::add);
-        findEmptyCellDiagonalUpLeft(coordinate).ifPresent(cells::add);
-        return cells;
-    }
-
-    private Optional<BoardCell> findEmptyCellUp(Coordinate coordinate) {
-        return findEmptyCell(new Coordinate(coordinate.getX(), coordinate.getY() - 1));
-    }
-
-    private Optional<BoardCell> findEmptyCellRight(Coordinate coordinate) {
-        return findEmptyCell(new Coordinate(coordinate.getX() + 1, coordinate.getY()));
-    }
-
-    private Optional<BoardCell> findEmptyCellDown(Coordinate coordinate) {
-        return findEmptyCell(new Coordinate(coordinate.getX(), coordinate.getY() + 1));
-    }
-
-    private Optional<BoardCell> findEmptyCellLeft(Coordinate coordinate) {
-        return findEmptyCell(new Coordinate(coordinate.getX() - 1, coordinate.getY()));
-    }
-
-    private Optional<BoardCell> findEmptyCellDiagonalUpRight(Coordinate coordinate) {
-        return findEmptyCell(new Coordinate(coordinate.getX() + 1, coordinate.getY() - 1));
-    }
-
-    private Optional<BoardCell> findEmptyCellDiagonalDownRight(Coordinate coordinate) {
-        return findEmptyCell(new Coordinate(coordinate.getX() + 1, coordinate.getY() + 1));
-    }
-
-    private Optional<BoardCell> findEmptyCellDiagonalDownLeft(Coordinate coordinate) {
-        return findEmptyCell(new Coordinate(coordinate.getX() - 1, coordinate.getY() + 1));
-    }
-
-    private Optional<BoardCell> findEmptyCellDiagonalUpLeft(Coordinate coordinate) {
-        return findEmptyCell(new Coordinate(coordinate.getX() - 1, coordinate.getY() - 1));
-    }
-
-    private Optional<BoardCell> findEmptyCell(Coordinate coordinate) {
-        Optional<BoardCell> optionalBoardCell = Optional.ofNullable(cellMap.get(coordinate));
-        if (optionalBoardCell.isPresent()) {
-            BoardCell boardCell = optionalBoardCell.get();
-            if (boardCell.getType() != BoardCellType.EMPTY) {
-                optionalBoardCell = Optional.empty();
-            }
-        }
-        return optionalBoardCell;
-    }
-
     private BoardCell findRandomEmptyCell() {
         List<BoardCell> emptyCells = cellMapByType.get(BoardCellType.EMPTY);
         return emptyCells.get(RANDOM.nextInt(emptyCells.size()));
+    }
+
+    private void drawMissed(BoardCell targetBoardCell) {
+        cellMapByType.get(BoardCellType.EMPTY).remove(targetBoardCell);
+        cellMapByType.get(BoardCellType.SHIP_BORDER_WATERS).remove(targetBoardCell);
+        targetBoardCell.setType(BoardCellType.MISSED_HIT);
+        cellMapByType.get(BoardCellType.MISSED_HIT).add(targetBoardCell);
+    }
+
+    private void drawDamaged(BoardCell targetBoardCell) {
+        cellMapByType.get(BoardCellType.SHIP).remove(targetBoardCell);
+        targetBoardCell.setType(BoardCellType.DAMAGED);
+        cellMapByType.get(BoardCellType.DAMAGED).add(targetBoardCell);
+    }
+
+    private void drawDestroyed(Ship ship) {
+        List<BoardCell> damagedCells = cellMapByType.get(BoardCellType.DAMAGED);
+        List<BoardCell> destroyedCells = cellMapByType.get(BoardCellType.DESTROYED);
+        for (Coordinate coordinate : ship.getCoordinates()) {
+            BoardCell cell = cellMap.get(coordinate);
+            damagedCells.remove(cell);
+            cell.setType(BoardCellType.DESTROYED);
+            destroyedCells.add(cell);
+        }
     }
 }

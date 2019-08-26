@@ -1,7 +1,5 @@
-package com.tymoshenko.seabattle;
+package com.tymoshenko.seabattle.board;
 
-import com.tymoshenko.seabattle.board.Board;
-import com.tymoshenko.seabattle.board.PlayerBoard;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
