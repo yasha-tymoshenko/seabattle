@@ -39,6 +39,14 @@ public class Player {
         return shotResult;
     }
 
+    public boolean isFleetDestroyed() {
+        return boardOwn.getFleet().isDestroyed();
+    }
+
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(String.format("\n\n%30s", "Player:\t")).append(name).append("\n");

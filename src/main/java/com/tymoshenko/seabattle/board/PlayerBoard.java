@@ -25,6 +25,10 @@ public class PlayerBoard extends Board {
         }
     }
 
+    public Fleet getFleet() {
+        return fleet;
+    }
+
     public ShotResult processEnemyShot(Coordinate targetCoordinate) {
         BoardCell targetBoardCell = cellMap.get(targetCoordinate);
         BoardCellType shotResultType;
