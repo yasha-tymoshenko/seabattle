@@ -22,6 +22,25 @@ public abstract class Board {
         return printBoard();
     }
 
+    String printBoard() {
+        StringBuilder sb = new StringBuilder("\n");
+        for (int y = 0; y < HEIGHT; y++) {
+            sb.append(String.format("%2d", y)).append(" ");
+            for (int x = 0; x < WIDTH; x++) {
+                Coordinate coordinate = new Coordinate(x, y);
+                BoardCell cell = cellMap.get(coordinate);
+                sb.append(cell.getType()).append(" ");
+            }
+            sb.append("\n");
+        }
+        sb.append("   ");
+        for (char ch = 'A'; ch < 'A' + WIDTH; ch++) {
+            sb.append(ch).append(" ");
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
+
     List<BoardCell> findBorderCells(Coordinate coordinate) {
         List<BoardCell> cells = new ArrayList<>();
         findEmptyCellRight(coordinate).ifPresent(cells::add);
@@ -76,25 +95,6 @@ public abstract class Board {
             }
         }
         return optionalBoardCell;
-    }
-
-    String printBoard() {
-        StringBuilder sb = new StringBuilder("\n");
-        for (int y = 0; y < HEIGHT; y++) {
-            sb.append(String.format("%2d", y)).append(" ");
-            for (int x = 0; x < WIDTH; x++) {
-                Coordinate coordinate = new Coordinate(x, y);
-                BoardCell cell = cellMap.get(coordinate);
-                sb.append(cell.getType()).append(" ");
-            }
-            sb.append("\n");
-        }
-        sb.append("   ");
-        for (char ch = 'A'; ch < 'A' + WIDTH; ch++) {
-            sb.append(ch).append(" ");
-        }
-        sb.append("\n");
-        return sb.toString();
     }
 
     private void initCells() {

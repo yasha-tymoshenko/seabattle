@@ -58,10 +58,10 @@ public class EnemyBoard extends Board {
             cell.setType(BoardCellType.DESTROYED);
             destroyedCells.add(cell);
 
-            findBorderCells(shipCoordinate).forEach(boardCell -> {
-                boardCell.setType(BoardCellType.MISSED_HIT);
-                missedCells.add(boardCell);
-                emptyCells.remove(boardCell);
+            findBorderCells(shipCoordinate).forEach(borderCell -> {
+                borderCell.setType(BoardCellType.MISSED_HIT);
+                missedCells.add(borderCell);
+                emptyCells.remove(borderCell);
             });
         }
     }

@@ -6,5 +6,5 @@ import lombok.Value;
 @Value
 @AllArgsConstructor
 public class Coordinate {
-    private int x, y;
+    private final int x, y;
 }

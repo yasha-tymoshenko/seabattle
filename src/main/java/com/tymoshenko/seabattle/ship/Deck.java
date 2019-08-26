@@ -8,7 +8,7 @@ public class Deck {
     private final Coordinate coordinate;
     private boolean hit;
 
-    public Deck(Coordinate coordinate) {
+    Deck(Coordinate coordinate) {
         this.coordinate = coordinate;
         hit = false;
     }
