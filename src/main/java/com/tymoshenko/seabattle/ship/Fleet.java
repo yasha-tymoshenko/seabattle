@@ -3,6 +3,7 @@ package com.tymoshenko.seabattle.ship;
 import com.tymoshenko.seabattle.board.Coordinate;
 
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class Fleet {
@@ -17,12 +18,11 @@ public class Fleet {
         ships.add(ship);
     }
 
-    public Ship getShipByCoordinate(Coordinate coordinate) {
+    public Optional<Ship> getShipByCoordinate(Coordinate coordinate) {
         return ships.stream()
                 .filter(ship -> !ship.isDestroyed())
                 .filter(ship -> ship.getCoordinates().contains(coordinate))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     public boolean isDestroyed() {

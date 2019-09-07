@@ -41,7 +41,11 @@ public class PlayerBoard extends Board {
                 break;
             case SHIP: {
                 // Damaged or destroyed
-                Ship shipUnderAttack = fleet.getShipByCoordinate(targetCoordinate);
+                Optional<Ship> shipByCoordinate = fleet.getShipByCoordinate(targetCoordinate);
+                if (!shipByCoordinate.isPresent()) {
+                    throw new IllegalTargetException(String.format("No ship found at [%s].", targetCoordinate));
+                }
+                Ship shipUnderAttack = shipByCoordinate.get();
                 shipUnderAttack.damage(targetCoordinate);
                 if (shipUnderAttack.isDestroyed()) {
                     shotResultType = BoardCellType.DESTROYED;
@@ -71,14 +75,14 @@ public class PlayerBoard extends Board {
                 try {
                     placeShipRandom(shipType);
                 } catch (CantPlaceShipException e) {
-                    log.warn("Can't place random ship.", e);
+                    log.debug("Can't place random ship.", e);
                     boolean placed = false;
                     for (int retry = 0; retry < 200; retry++) {
                         try {
                             placeShipRandom(shipType);
                             placed = true;
                         } catch (CantPlaceShipException ex) {
-                            log.warn("Retry #{}.", retry, ex);
+                            log.debug("Retry #{}.", retry, ex);
                             continue;
                         }
                         break;
@@ -98,7 +102,7 @@ public class PlayerBoard extends Board {
         try {
             placeShip(type, orientation, randomFirstDeckCoordinate);
         } catch (CantPlaceShipException e) {
-            log.warn("Can't place random ship.", e);
+            log.debug("Can't place random ship.", e);
             placeShip(type, Orientation.invert(orientation), randomFirstDeckCoordinate);
         }
     }
