@@ -2,6 +2,7 @@ package com.tymoshenko.seabattle;
 
 import com.tymoshenko.seabattle.board.BoardCellType;
 import com.tymoshenko.seabattle.board.Coordinate;
+import com.tymoshenko.seabattle.exception.GameOverException;
 import com.tymoshenko.seabattle.player.Player;
 import com.tymoshenko.seabattle.player.ShotResult;
 import lombok.extern.slf4j.Slf4j;
@@ -17,24 +18,24 @@ public class Game {
     }
 
     public void start() {
-        int moveNumber = 1;
-        do {
-            moveNumber = playerMove(player1, player2, moveNumber);
-            if (player2.isFleetDestroyed()) {
-                break;
-            }
-            moveNumber = playerMove(player2, player1, moveNumber);
-        } while (!player1.isFleetDestroyed() && !player2.isFleetDestroyed());
-        Player winner;
-        if (player1.isFleetDestroyed()) {
-            winner = player2;
-        } else {
-            winner = player1;
+        try {
+            play();
+        } catch (GameOverException e) {
+            Player winner = player1.isFleetDestroyed() ? player2 : player1;
+            log.info("\n\nThe winner is: \t[{}]!\n", winner.getName());
         }
-        log.info("\n\nThe winner is: \t[{}]!\n", winner.getName());
+
     }
 
-    private int playerMove(Player player, Player enemy, int moveNumber) {
+    private void play() throws GameOverException {
+        int moveNumber = 1;
+        while (moveNumber <= 2 * 10 * 10) {
+            moveNumber = playerMove(player1, player2, moveNumber);
+            moveNumber = playerMove(player2, player1, moveNumber);
+        }
+    }
+
+    private int playerMove(Player player, Player enemy, int moveNumber) throws GameOverException {
         ShotResult shotResult;
         do {
             Coordinate target = player.move();
@@ -42,9 +43,16 @@ public class Game {
             player.drawOwnShotResult(shotResult);
             log.info("----- Move #{}. ----- {}", moveNumber, player.toString());
             moveNumber++;
-        } while (!enemy.isFleetDestroyed() && (shotResult.getBoardCellType() == BoardCellType.DAMAGED ||
-                shotResult.getBoardCellType() == BoardCellType.DESTROYED));
+            if (enemy.isFleetDestroyed()) {
+                throw new GameOverException(String.format("Player's [%s] fleet has been destroyed!", enemy.getName()));
+            }
+        } while (isEnemyHit(shotResult));
         return moveNumber;
+    }
+
+    private boolean isEnemyHit(ShotResult shotResult) {
+        BoardCellType shotResultType = shotResult.getBoardCellType();
+        return shotResultType == BoardCellType.DAMAGED || shotResultType == BoardCellType.DESTROYED;
     }
 
 }

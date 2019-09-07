@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 public class Ship {
@@ -18,26 +19,14 @@ public class Ship {
 
     public Ship(ShipType type, Orientation orientation, Coordinate firstDeckCoordinate) {
         this.type = type;
-        List<Deck> decks = new ArrayList<>();
-        for (int i = 0; i < type.getDeckCount(); i++) {
-            Coordinate coordinate;
-            if (orientation == Orientation.HORIZONTAL) {
-                coordinate = new Coordinate(firstDeckCoordinate.getX() + i, firstDeckCoordinate.getY());
-            } else {
-                coordinate = new Coordinate(firstDeckCoordinate.getX(), firstDeckCoordinate.getY() + i);
-            }
-            decks.add(new Deck(coordinate));
-        }
-        this.decks = Collections.unmodifiableList(decks);
+        this.decks = initDecks(type, orientation, firstDeckCoordinate);
         this.orientation = orientation;
-        Set<Coordinate> coordinates = new HashSet<>();
-        for (Deck deck : decks) {
-            coordinates.add(deck.getCoordinate());
-        }
-        this.coordinates = Collections.unmodifiableSet(coordinates);
+        this.coordinates = Collections.unmodifiableSet(
+                decks.stream().map(Deck::getCoordinate).collect(Collectors.toSet()));
         isBuilt = false;
         isDestroyed = false;
     }
+
 
     public Deck getFirstDeck() {
         return decks.get(0);
@@ -48,23 +37,32 @@ public class Ship {
     }
 
     public void damage(Coordinate coordinate) {
-        for (Deck deck : decks) {
-            if (deck.getCoordinate().equals(coordinate)) {
-                deck.setHit(true);
-                return;
-            }
-        }
+        decks.stream()
+                .filter(deck -> deck.getCoordinate().equals(coordinate))
+                .findFirst()
+                .ifPresent(deck -> deck.setHit(true));
     }
 
     public boolean isDestroyed() {
-        boolean destroyed = true;
-        for (Deck deck : decks) {
-            if (!deck.isHit()) {
-                destroyed = false;
-                break;
-            }
+        return decks.stream().allMatch(Deck::isHit);
+    }
+
+    private List<Deck> initDecks(ShipType type, Orientation orientation, Coordinate firstDeckCoordinate) {
+        List<Deck> decks = new ArrayList<>();
+        for (int deckNumber = 0; deckNumber < type.getDeckCount(); deckNumber++) {
+            addDeck(decks, firstDeckCoordinate, deckNumber, orientation);
         }
-        return destroyed;
+        return Collections.unmodifiableList(decks);
+    }
+
+    private void addDeck(List<Deck> decks, Coordinate firstDeckCoordinate, int deckNumber, Orientation orientation) {
+        Coordinate coordinate;
+        if (orientation == Orientation.HORIZONTAL) {
+            coordinate = new Coordinate(firstDeckCoordinate.getX() + deckNumber, firstDeckCoordinate.getY());
+        } else {
+            coordinate = new Coordinate(firstDeckCoordinate.getX(), firstDeckCoordinate.getY() + deckNumber);
+        }
+        decks.add(new Deck(coordinate));
     }
 
 }

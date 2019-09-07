@@ -9,8 +9,8 @@ public class GameTest {
     @Test
     public void gameTest() {
         Player yakiv = new Player("Yakiv", new ShootingStrategyRandom());
-        Player dima = new Player("Dima", new ShootingStrategyRandom());
-        Game game = new Game(yakiv, dima);
+        Player computer = new Player("Computer", new ShootingStrategyRandom());
+        Game game = new Game(yakiv, computer);
         game.start();
     }
 }

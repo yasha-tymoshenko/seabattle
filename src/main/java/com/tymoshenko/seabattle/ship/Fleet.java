@@ -18,27 +18,14 @@ public class Fleet {
     }
 
     public Ship getShipByCoordinate(Coordinate coordinate) {
-        Ship result = null;
-        for (Ship ship : ships) {
-            if (ship.isDestroyed()) {
-                continue;
-            }
-            if (ship.getCoordinates().contains(coordinate)) {
-                result = ship;
-                break;
-            }
-        }
-        return result;
+        return ships.stream()
+                .filter(ship -> !ship.isDestroyed())
+                .filter(ship -> ship.getCoordinates().contains(coordinate))
+                .findFirst()
+                .orElse(null);
     }
 
     public boolean isDestroyed() {
-        boolean destroyed = true;
-        for (Ship ship : ships) {
-            if (!ship.isDestroyed()) {
-                destroyed = false;
-                break;
-            }
-        }
-        return destroyed;
+        return ships.stream().allMatch(Ship::isDestroyed);
     }
 }

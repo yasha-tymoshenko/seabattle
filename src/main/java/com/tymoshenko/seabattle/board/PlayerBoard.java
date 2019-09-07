@@ -141,15 +141,11 @@ public class PlayerBoard extends Board {
     }
 
     private boolean isNoConflicts(Ship ship) {
-        boolean conflict = false;
+        boolean conflict;
         Set<Coordinate> coordinates = ship.getCoordinates();
-        for (Coordinate shipCoordinate : coordinates) {
-            BoardCell plannedShipCell = cellMap.get(shipCoordinate);
-            if (BoardCellType.EMPTY != plannedShipCell.getType()) {
-                conflict = true;
-                break;
-            }
-        }
+        conflict = coordinates.stream()
+                .map(shipCoordinate -> cellMap.get(shipCoordinate))
+                .anyMatch(plannedShipCell -> BoardCellType.EMPTY != plannedShipCell.getType());
         return !conflict;
     }
 

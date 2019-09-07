@@ -12,8 +12,8 @@ public class PlayerTest {
 
     @Test
     public void testPlayerCreation() {
-        Player player1 = new Player("Yakiv", new ShootingStrategyRandom());
-        Player player2 = new Player("Dima", new ShootingStrategyRandom());
+        Player player1 = new Player("Human", new ShootingStrategyRandom());
+        Player player2 = new Player("Computer", new ShootingStrategyRandom());
 
         int moves = 1;
         final int maxMoves = 100;
